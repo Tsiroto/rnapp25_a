@@ -1,59 +1,84 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs, router } from 'expo-router';
+import { useColorScheme } from '../../components/useColorScheme';
+import Colors from '../../constants/Colors';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { useAudio } from '@/utils/useAudio';
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
+    name: React.ComponentProps<typeof FontAwesome>['name'];
+    color: string;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+    return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+    const colorScheme = useColorScheme();
+    // Initialize audio hook with opening track but don't play it automatically
+    const { playEffect } = useAudio('opening', false);
 
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="two"
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
+    // Custom tab bar button for Play that navigates to gameScreen
+    const PlayTabButton = (props: any) => {
+        return (
+            <TouchableOpacity
+                {...props}
+                onPress={async () => {
+                    // Play click sound effect
+                    await playEffect('click');
+                    // Navigate to game screen
+                    router.push('/gameScreen');
+                }}
+            />
+        );
+    };
+
+    // Custom tab bar button for Settings that plays sound
+    const SettingsTabButton = (props: any) => {
+        return (
+            <TouchableOpacity
+                {...props}
+                onPress={async () => {
+                    // Play click sound effect
+                    await playEffect('click');
+                    // Navigate to settings tab
+                    router.push('/(tabs)/settings');
+                }}
+            />
+        );
+    };
+
+    return (
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaProvider>
+                <Tabs
+                    screenOptions={{
+                        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+                        headerShown: false,
+                    }}
+                >
+                    <Tabs.Screen
+                        name="index"
+                        options={{
+                            title: 'Play',
+                            tabBarIcon: ({ color }) => <TabBarIcon name="gamepad" color={color} />,
+                            headerShown: false,
+                            tabBarButton: PlayTabButton,
+                        }}
+                    />
+                    <Tabs.Screen
+                        name="settings"
+                        options={{
+                            title: 'Settings',
+                            tabBarIcon: ({ color }) => <TabBarIcon name="gear" color={color} />,
+                            tabBarButton: SettingsTabButton,
+                        }}
+                    />
+                </Tabs>
+            </SafeAreaProvider>
+        </GestureHandlerRootView>
+    );
 }
