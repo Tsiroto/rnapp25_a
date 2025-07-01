@@ -1,37 +1,72 @@
-# Audio Implementation for Game25
+# Loli-cat Game
 
-This project has been updated to include audio functionality as requested:
+A cross-platform game built with React Native and Expo, supporting both web and mobile platforms.
 
-1. The opening song ("excel_saga_opening.mp3") autoplays when the app opens
-2. The "Shukusei!!.mp3" sound plays when the game starts
-3. The ending song ("excel_saga_ending.mp3") will play when the player loses (to be implemented later)
-4. All songs are set to loop continuously
+## Current Status
 
-## Implementation Details
+### Implemented Features
 
-- Audio is managed through the `utils/useAudio.ts` custom React hook
-- The opening song is initialized and played in `app/_layout.tsx` when the app loads
-- The "shukusei" sound is triggered in `app/(tabs)/index.tsx` when the user taps to start the game
-- The ending song functionality is prepared but will be implemented later when gameplay is added
+#### Navigation & UI
+- Home screen with animated title and "Tap/Click to start" prompt
+- Settings screen with collapsible sections
+- Game screen placeholder with menu
+- Cross-platform support (web and mobile)
 
-## Audio Files
+#### Audio System
+- Background music that plays when the app opens
+- Sound effects for user interactions (confirm, click, cancel)
+- Audio settings with volume controls for:
+  - Master volume
+  - Music volume
+  - Sound effects volume
+- Mute/unmute functionality (including keyboard shortcut 'm' on web)
+- Persistent audio settings (saved between sessions)
 
-Current audio files:
-- `/assets/sounds/music/excel_saga_opening.mp3`
-- `/assets/sounds/music/excel_saga_ending.mp3`
-- `/assets/sounds/music/Shukusei!!.mp3`
+#### Settings
+- Fully functional audio settings
+- UI placeholders for controls, account, and general settings
 
-## Audio Hook Usage
+### Under Construction
 
-The custom `useAudio` hook provides a simple interface for playing audio tracks:
+#### Game Implementation
+- The actual game mechanics and gameplay are still under development
+- The game screen currently only shows a placeholder with "Game Screen" text
+
+#### Additional Settings
+- Controls settings (touch sensitivity, show controls)
+- Account settings (username, email, password, logout)
+- General settings (tutorial tips)
+
+## Technical Implementation
+
+### Audio System
+
+Audio is implemented differently for web and native platforms:
+- Web: Uses Howler.js for audio playback
+- Native: Uses react-native-sound with AsyncStorage for settings persistence
+
+The audio system is managed through the `useAudio` custom React hook:
 
 ```typescript
 // Initialize with a track to play immediately
-const { play, stop, unload } = useAudio('opening');
+const { play, stop, playEffect } = useAudio('opening');
 
-// Or initialize without playing anything
-const { play } = useAudio(null as any);
+// Play a sound effect
+await playEffect('confirm');
 
-// Play a specific track later
+// Play a different track
 await play('shukusei');
+
+// Toggle mute state
+toggleMute();
 ```
+
+### File Structure
+
+- `app/`: Main application code
+  - `(tabs)/`: Tab-based navigation screens
+  - `gameScreen.tsx`: Game implementation (placeholder)
+- `assets/`: Images, sounds, and other assets
+- `components/`: Reusable UI components
+- `utils/`: Utility functions including audio hooks
+- `constants/`: Configuration constants
